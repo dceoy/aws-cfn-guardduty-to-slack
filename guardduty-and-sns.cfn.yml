@@ -41,3 +41,16 @@ Resources:
       Targets:
         - Arn: !Ref SnsTopic
           Id: guardduty-sns-topic
+Outputs:
+  GuardDutyDetector:
+    Value: !Ref GuardDutyDetector
+    Export:
+      Name: !Sub ${AWS::StackName}-GuardDutyDetector
+  SnsTopic:
+    Value: !Ref SnsTopic
+    Export:
+      Name: !Sub ${AWS::StackName}-SnsTopic
+  EventRule:
+    Value: !Ref EventRule
+    Export:
+      Name: !Sub ${AWS::StackName}-EventRule
