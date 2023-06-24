@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: Configure AWS IAM roles to enable use of AWS CloudFormation StackSets.
+Description: IAM roles for CloudFormation StackSets
 Resources:
   CloudFormationStackSetAdministrationRole:
     Type: AWS::IAM::Role

@@ -1,17 +1,17 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: Configure AWS Chatbot for cross-region notification to Slack.
+Description: Chatbot for cross-region notification to Slack
 Parameters:
   SnsTopicName:
-    Description: SNS Topic Name.
+    Description: Set the SNS topic name.
     Type: String
     Default: guardduty-finding-topic
   SlackWorkspaceId:
-    Description: Slack Workspace ID.
+    Description: Set the Slack workspace ID.
     Type: String
     Default: XXXXXXXXX
   SlackChannelId:
-    Description: Slack Channel ID.
+    Description: Set the Slack channel ID.
     Type: String
     Default: amazonguardduty
 Resources:
@@ -43,8 +43,14 @@ Resources:
         - !Sub arn:aws:sns:sa-east-1:${AWS::AccountId}:${SnsTopicName}
         # - !Sub arn:aws:sns:af-south-1:${AWS::AccountId}:${SnsTopicName}
         # - !Sub arn:aws:sns:ap-east-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:ap-south-2:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:ap-southeast-3:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:ap-southeast-4:${AWS::AccountId}:${SnsTopicName}
         # - !Sub arn:aws:sns:eu-south-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:eu-south-2:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:eu-central-2:${AWS::AccountId}:${SnsTopicName}
         # - !Sub arn:aws:sns:me-south-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:aws:sns:me-central-1:${AWS::AccountId}:${SnsTopicName}
 Outputs:
   ChatbotConfiguration:
     Value: !Ref ChatbotConfiguration

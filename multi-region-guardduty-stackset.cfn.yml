@@ -1,0 +1,125 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: StackSet of GuardDuty, EventBridge, and SNS
+Parameters:
+  StackSetName:
+    Description: Set the StackSet name.
+    Type: String
+    Default: multi-region-guardduty-stackset
+  SnsTopicName:
+    Description: Set the SNS topic names.
+    Type: String
+    Default: guardduty-finding-topic
+Resources:
+  GuardDutyStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      StackSetName: !Ref StackSetName
+      Description: GuardDuty, EventBridge, and SNS
+      AdministrationRoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/AWSCloudFormationStackSetAdministrationRole
+      ExecutionRoleName: AWSCloudFormationStackSetExecutionRole
+      PermissionModel: SELF_MANAGED
+      # Capabilities:
+      #   - CAPABILITY_NAMED_IAM
+      OperationPreferences:
+        RegionConcurrencyType: PARALLEL
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref AWS::AccountId
+          Regions:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-northeast-3
+            - ap-northeast-2
+            - ap-southeast-1
+            - ap-southeast-2
+            - ap-northeast-1
+            - ca-central-1
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+            # - af-south-1
+            # - ap-east-1
+            # - ap-south-2
+            # - ap-southeast-3
+            # - ap-southeast-4
+            # - eu-south-1
+            # - eu-south-2
+            # - eu-central-2
+            # - me-south-1
+            # - me-central-1
+      Parameters:
+        - ParameterKey: SnsTopicName
+          ParameterValue: !Ref SnsTopicName
+      TemplateBody: |
+        ---
+        AWSTemplateFormatVersion: 2010-09-09
+        Description: GuardDuty, EventBridge, and SNS
+        Parameters:
+          SnsTopicName:
+            Description: Set the SNS topic names.
+            Type: String
+            Default: guardduty-finding-topic
+        Resources:
+          GuardDutyDetector:
+            Type: AWS::GuardDuty::Detector
+            Properties:
+              Enable: true
+          SnsTopic:
+            Type: AWS::SNS::Topic
+            Properties:
+              TopicName: !Ref SnsTopicName
+          SnsTopicPolicy:
+            Type: AWS::SNS::TopicPolicy
+            Properties:
+              PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                  - Effect: Allow
+                    Principal:
+                      Service:
+                        - events.amazonaws.com
+                    Action: sns:Publish
+                    Resource: '*'
+              Topics:
+                - !Ref SnsTopic
+          EventRule:
+            Type: AWS::Events::Rule
+            Properties:
+              Name: !Sub ${SnsTopicName}-event-rule
+              EventPattern:
+                source:
+                  - aws.guardduty
+                detail-type:
+                  - GuardDuty Finding
+              Targets:
+                - Arn: !Ref SnsTopic
+                  Id: guardduty-sns-topic
+        Outputs:
+          GuardDutyDetector:
+            Value: !Ref GuardDutyDetector
+            Export:
+              Name: !Sub ${AWS::Region}-${AWS::StackName}-GuardDutyDetector
+          SnsTopic:
+            Value: !Ref SnsTopic
+            Export:
+              Name: !Sub ${AWS::Region}-${AWS::StackName}-SnsTopic
+          EventRule:
+            Value: !Ref EventRule
+            Export:
+              Name: !Sub ${AWS::Region}-${AWS::StackName}-EventRule
+      Tags:
+        - Key: Name
+          Value: !Ref StackSetName
+Outputs:
+  GuardDutyStackSetId:
+    Value: !GetAtt GuardDutyStackSet.StackSetId
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-GuardDutyStackSetId
