@@ -25,6 +25,9 @@ Resources:
                   - sts:AssumeRole
                 Resource:
                   - arn:*:iam::*:role/AWSCloudFormationStackSetExecutionRole
+      Tags:
+        - Key: Name
+          Value: AWSCloudFormationStackSetAdministrationRole
   CloudFormationStackSetExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -41,6 +44,9 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Name
+          Value: AWSCloudFormationStackSetExecutionRole
 Outputs:
   CloudFormationStackSetAdministrationRoleArn:
     Value: !GetAtt CloudFormationStackSetAdministrationRole.Arn

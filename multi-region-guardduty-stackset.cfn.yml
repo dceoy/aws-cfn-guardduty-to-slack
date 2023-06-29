@@ -76,6 +76,9 @@ Resources:
             Type: AWS::SNS::Topic
             Properties:
               TopicName: !Ref SnsTopicName
+              Tags:
+                - Key: Name
+                  Value: !Ref SnsTopicName
           SnsTopicPolicy:
             Type: AWS::SNS::TopicPolicy
             Properties:
