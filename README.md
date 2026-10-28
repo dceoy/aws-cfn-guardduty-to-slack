@@ -16,45 +16,24 @@ AI Protection monitors CloudTrail data events for Amazon Bedrock, Amazon Bedrock
 
 ## Deployment
 
-Prerequisites: [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with configured AWS credentials and permissions to deploy CloudFormation and IAM roles, and a Slack workspace authorized in the [Amazon Q Developer in chat applications console](https://console.aws.amazon.com/chatbot/). Run these commands from the repository root in the AWS account that owns the StackSet. Choose the CloudFormation management Region:
+Prerequisites: AWS credentials with permissions to deploy CloudFormation and the IAM roles, [Rain](https://github.com/aws-cloudformation/rain), and a Slack workspace authorized in the [Amazon Q Developer in chat applications console](https://console.aws.amazon.com/chatbot/).
 
-```sh
-export AWS_REGION=ap-northeast-1
-```
-
-1. Deploy the IAM roles for self-managed StackSets. The template defines named IAM roles, so `CAPABILITY_NAMED_IAM` is required:
+1. Deploy the IAM roles in the account that owns the StackSet:
 
    ```sh
-   aws cloudformation deploy \
-     --region "$AWS_REGION" \
-     --template-file iam-roles-for-stacksets.cfn.yml \
-     --stack-name iam-roles-for-stacksets \
-     --capabilities CAPABILITY_NAMED_IAM
+   rain deploy iam-roles-for-stacksets.cfn.yml iam-roles-for-stacksets
    ```
 
-2. Deploy or update the regional GuardDuty StackSet using its parent CloudFormation stack:
+2. Deploy or update the regional GuardDuty StackSet in the same account:
 
    ```sh
-   aws cloudformation deploy \
-     --region "$AWS_REGION" \
-     --template-file multi-region-guardduty-stackset.cfn.yml \
-     --stack-name multi-region-guardduty-stackset
+   rain deploy multi-region-guardduty-stackset.cfn.yml multi-region-guardduty-stackset
    ```
 
-3. Copy the **Slack workspace ID** and **Slack channel ID** (not the channel name). Replace the placeholders with your real IDs and deploy the notification stack:
+3. Copy the **Slack workspace ID** and **Slack channel ID** (not the channel name). Deploy the notification stack and enter both values when Rain prompts for parameters:
 
    ```sh
-   export SLACK_WORKSPACE_ID='YOUR_WORKSPACE_ID'
-   export SLACK_CHANNEL_ID='YOUR_CHANNEL_ID'
-
-   aws cloudformation deploy \
-     --region "$AWS_REGION" \
-     --template-file cross-region-chatbot.cfn.yml \
-     --stack-name cross-region-chatbot \
-     --capabilities CAPABILITY_IAM \
-     --parameter-overrides \
-       "SlackWorkspaceId=${SLACK_WORKSPACE_ID}" \
-       "SlackChannelId=${SLACK_CHANNEL_ID}"
+   rain deploy cross-region-chatbot.cfn.yml cross-region-chatbot
    ```
 
    Deploy the notification stack only after the regional SNS topics exist. Do not deploy the same Slack channel configuration in multiple Regions.
