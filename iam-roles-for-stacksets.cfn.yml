@@ -24,7 +24,7 @@ Resources:
                 Action:
                   - sts:AssumeRole
                 Resource:
-                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/AWSCloudFormationStackSetExecutionRole
+                  - !Sub arn:${AWS::Partition}:iam::*:role/AWSCloudFormationStackSetExecutionRole
       Tags:
         - Key: Name
           Value: AWSCloudFormationStackSetAdministrationRole
