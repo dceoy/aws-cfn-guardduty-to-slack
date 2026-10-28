@@ -16,7 +16,7 @@ Resources:
     Properties:
       StackSetName: !Ref StackSetName
       Description: GuardDuty, EventBridge, and SNS
-      AdministrationRoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/AWSCloudFormationStackSetAdministrationRole
+      AdministrationRoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/AWSCloudFormationStackSetAdministrationRole
       ExecutionRoleName: AWSCloudFormationStackSetExecutionRole
       PermissionModel: SELF_MANAGED
       # Capabilities:
@@ -72,6 +72,10 @@ Resources:
             Type: AWS::GuardDuty::Detector
             Properties:
               Enable: true
+              Features:
+                - Name: AI_PROTECTION
+                  Status: ENABLED
+              FindingPublishingFrequency: FIFTEEN_MINUTES
           SnsTopic:
             Type: AWS::SNS::Topic
             Properties:
@@ -90,7 +94,7 @@ Resources:
                       Service:
                         - events.amazonaws.com
                     Action: sns:Publish
-                    Resource: '*'
+                    Resource: !Ref SnsTopic
               Topics:
                 - !Ref SnsTopic
           EventRule:

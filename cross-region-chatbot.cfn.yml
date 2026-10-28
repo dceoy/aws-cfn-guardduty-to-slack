@@ -7,50 +7,64 @@ Parameters:
     Type: String
     Default: guardduty-finding-topic
   SlackWorkspaceId:
-    Description: Set the Slack workspace ID.
+    Description: Slack workspace ID authorized in Amazon Q Developer in chat applications.
     Type: String
-    Default: XXXXXXXXX
+    AllowedPattern: '^[0-9A-Z]+$'
   SlackChannelId:
-    Description: Set the Slack channel ID.
+    Description: Slack channel ID (not the channel name).
     Type: String
-    Default: amazonguardduty
+    AllowedPattern: '^[A-Za-z0-9]+$'
 Resources:
+  ChatbotReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: chatbot.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonGuardDutyReadOnlyAccess
   ChatbotConfiguration:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
       ConfigurationName: !Sub ${SnsTopicName}-chatbot-config
-      IamRoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/management.chatbot.amazonaws.com/AWSServiceRoleForAWSChatbot
-      LoggingLevel: NONE
+      IamRoleArn: !GetAtt ChatbotReadOnlyRole.Arn
+      GuardrailPolicies:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonGuardDutyReadOnlyAccess
+      LoggingLevel: ERROR
       SlackChannelId: !Ref SlackChannelId
       SlackWorkspaceId: !Ref SlackWorkspaceId
       SnsTopicArns:
-        - !Sub arn:aws:sns:us-east-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:us-east-2:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:us-west-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-south-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-northeast-3:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-northeast-2:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-southeast-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-southeast-2:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ap-northeast-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:ca-central-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:eu-central-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:eu-west-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:eu-west-2:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:eu-west-3:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:eu-north-1:${AWS::AccountId}:${SnsTopicName}
-        - !Sub arn:aws:sns:sa-east-1:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:af-south-1:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:ap-east-1:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:ap-south-2:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:ap-southeast-3:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:ap-southeast-4:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:eu-south-1:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:eu-south-2:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:eu-central-2:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:me-south-1:${AWS::AccountId}:${SnsTopicName}
-        # - !Sub arn:aws:sns:me-central-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:us-east-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:us-east-2:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:us-west-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:us-west-2:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-south-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-northeast-3:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-northeast-2:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-southeast-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-southeast-2:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ap-northeast-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:ca-central-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:eu-central-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:eu-west-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:eu-west-2:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:eu-west-3:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:eu-north-1:${AWS::AccountId}:${SnsTopicName}
+        - !Sub arn:${AWS::Partition}:sns:sa-east-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:af-south-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:ap-east-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:ap-south-2:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:ap-southeast-3:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:ap-southeast-4:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:eu-south-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:eu-south-2:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:eu-central-2:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:me-south-1:${AWS::AccountId}:${SnsTopicName}
+        # - !Sub arn:${AWS::Partition}:sns:me-central-1:${AWS::AccountId}:${SnsTopicName}
 Outputs:
   ChatbotConfiguration:
     Value: !Ref ChatbotConfiguration
